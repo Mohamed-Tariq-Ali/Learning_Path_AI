@@ -1,0 +1,88 @@
+Keypoints:
+
+*List items are ordered , changeable and allows duplicate values. enclosed with square braces [].
+*To determine how many elements the list has , we use len() function.
+*List items can be of any datatype , it can different types of data.
+*From Python's perspective, lists are defined as objects with the data type 'list':
+*type() function is used to identify whats the datatype of the list.
+*list()-constructor is used when creating a new list.
+*we can do CRUD operations on the list.
+*append() method to add items in the list
+*insert() method used to add items in the specified index.
+*extend() method is used to combine two lists.
+*The extend() method does not have to append lists, you can add any iterable object (tuples, sets, dictionaries etc.).
+* clear() method is used to empty the list.
+* del method is used to delete the specified list element and also the entire lists.
+
+DOUBTS : While accessing elements during negative indexing , cant we get elements like [-1:] ?
+* while using extend() keyword , the extended list gets stored in the first list , example my_list.extend(list1) #stores the value in my_list. List1 remains the same.
+* Why am i getting None , when i try to print the sort function for the list , #print(list.sort()) ?
+* NEED SOME CLARIFICATION WITH LIST COMPREHENSION .
+
+========END OF LISTS==============================================================================================
+
+DICTIONARY :
+*Dictionaries are used to store key value pairs in data.
+* A dictionary is a collection which is ordered*, changeable and do not allow duplicates.
+* Enclosed with curly braces.
+*Updating and inserting the values in dictionary works the same way
+
+
+DOUBTS :
+dict1 = dict("Name" : "Tariq" , "Age" : 21 , "Location":"Chennai")  Why does this line is giving an error ?
+NEED CLARITY WITH DICT COMPREHENSION.
+
+======END OF DICTIONARY======================================================================
+
+SET:
+* Sets are used to store multiple items in a single variable.
+*A set is a collection which is unordered, unchangeable*, and unindexed.
+* Set items are unchangeable, but you can remove items and add new items.
+*Set items consider True and 1 as same and False and 0 as same and it doesn't allow it . Set doesn't allow duplicate values.
+*Enclosed with curly braces {}.
+*We cannot change the values in the set once its created.
+*add() method is used to add single  element to the set.
+*update() method is used to add multiple elements.
+*remove() method is used to remove the element, if the element is not present it will raise an error
+*discard() method is used to remove the element, if the element is not present it will raise NOT an error.
+*clear() method is used to clear all the elements in the set.
+
+SET OPERATIONS:'
+The union() and update() methods joins all items from both sets.
+
+The intersection() method keeps ONLY the duplicates.
+
+The difference() method keeps the items from the first set that are not in the other set(s).
+
+The symmetric_difference() method keeps all items EXCEPT the duplicates. we can also use ^ instead .
+
+* we can use | operator instead of union() method , it will give the same results.
+
+FROZEN SET:
+frozenset is an immutable version of a set.
+
+Like sets, it contains unique, unordered, unchangeable elements.
+
+Unlike sets, elements cannot be added or removed from a frozenset.
+
+==============END OF SET========================================================
+
+TUPLES :
+*Tuple items are ordered, unchangeable, and allow duplicate values.
+*Tuple items are indexed, the first item has index [0], the second item has index [1] etc.
+*Enclosed with round brackets ().
+*It allows duplicate values.
+*To create a tuple with only one item, you have to add a comma after the item, otherwise Python will not recognize it as a tuple. tuple1 =("hi",)
+CHECK IN TUPLE_PRACTICE FOR MORE KEYPOINTS
+
+=======================END OF TUPLES=========================
+COMPLETED DATATYPES IN DAY 1 STARTED TIME : 11 AM , ENDING TIME : 3.15 PM
+DATED : 18/12/2025
+
+COMPLETED CONDITIONAL STATEMENTS AND LOOPING CONCEPTS IN DAY 1 , STARTED TIME : 3.30 PM , ENDING TIME : 4.30 PM
+DATED : 18/12/2025
+
+
+
+
+

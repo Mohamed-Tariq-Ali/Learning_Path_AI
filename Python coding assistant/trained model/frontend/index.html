@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PALS AI</title>
+<style>
+/* Basic styling */
+* { margin:0; padding:0; box-sizing:border-box; }
+body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: linear-gradient(135deg,#667eea 0%,#764ba2 100%); height:100vh; display:flex; justify-content:center; align-items:center; padding:20px; }
+.container { background:white; border-radius:20px; box-shadow:0 20px 60px rgba(0,0,0,0.3); width:100%; max-width:800px; height:90vh; display:flex; flex-direction:column; overflow:hidden; }
+.header { background: linear-gradient(135deg,#667eea 0%,#764ba2 100%); color:white; padding:25px; text-align:center; }
+.header h1 { font-size:24px; margin-bottom:5px; }
+.header p { font-size:14px; opacity:0.9; }
+.chat-container { flex:1; overflow-y:auto; padding:20px; background:#f7f9fc; }
+.message { margin-bottom:20px; display:flex; animation:fadeIn 0.3s; }
+@keyframes fadeIn { from { opacity:0; transform:translateY(10px); } to { opacity:1; transform:translateY(0); } }
+.message.user { justify-content:flex-end; }
+.message-content { max-width:70%; padding:15px 20px; border-radius:18px; line-height:1.5; }
+.message.user .message-content { background:linear-gradient(135deg,#667eea 0%,#764ba2 100%); color:white; }
+.message.bot .message-content { background:white; color:#333; border:1px solid #e0e0e0; }
+.message.bot .message-content pre { background:#f4f4f4; padding:10px; border-radius:8px; overflow-x:auto; margin:10px 0; }
+.message.bot .message-content code { background:#f4f4f4; padding:2px 6px; border-radius:4px; font-family:'Courier New', monospace; font-size:13px; }
+.input-container { padding:20px; background:white; border-top:1px solid #e0e0e0; display:flex; gap:10px; }
+#questionInput { flex:1; padding:15px; border:2px solid #e0e0e0; border-radius:25px; font-size:15px; outline:none; transition:border-color 0.3s; }
+#questionInput:focus { border-color:#667eea; }
+#sendBtn { background:linear-gradient(135deg,#667eea 0%,#764ba2 100%); color:white; border:none; padding:15px 30px; border-radius:25px; cursor:pointer; font-size:15px; font-weight:600; transition:transform 0.2s, box-shadow 0.2s; }
+#sendBtn:hover:not(:disabled) { transform:translateY(-2px); box-shadow:0 5px 15px rgba(102,126,234,0.4); }
+#sendBtn:disabled { opacity:0.6; cursor:not-allowed; }
+.loading { display:inline-block; width:20px; height:20px; border:3px solid #f3f3f3; border-top:3px solid #667eea; border-radius:50%; animation:spin 1s linear infinite; }
+@keyframes spin { 0%{transform:rotate(0deg);}100%{transform:rotate(360deg);} }
+.examples { padding:15px; background:#fff3cd; border-left:4px solid #ffc107; margin:10px 0; border-radius:8px; }
+.examples h3 { margin-bottom:10px; color:#856404; }
+.example-btn { background:white; border:1px solid #ffc107; padding:8px 15px; margin:5px; border-radius:15px; cursor:pointer; font-size:13px; transition:all 0.2s; }
+.example-btn:hover { background:#ffc107; color:white; }
+.status { text-align:center; padding:10px; font-size:12px; color:#666; }
+.status.online { color:#28a745; }
+.status.offline { color:#dc3545; }
+</style>
+</head>
+<body>
+<div class="container">
+    <div class="header">
+        <h1>❤️ PALS AI ❤️</h1>
+        <p>Your AI-powered Friendly Python helper</p>
+    </div>
+
+    <div class="chat-container" id="chatContainer">
+        <div class="examples">
+            <h3>Try asking:</h3>
+            <button class="example-btn" onclick="askExample('How do I create a virtual environment in Python?')">Virtual environments</button>
+            <button class="example-btn" onclick="askExample('How do I use async/await in FastAPI?')">Async FastAPI</button>
+            <button class="example-btn" onclick="askExample('What are Python decorators?')">Decorators</button>
+            <button class="example-btn" onclick="askExample('How do I handle errors in Python?')">Error handling</button>
+        </div>
+    </div>
+
+    <div class="status" id="status">Checking connection...</div>
+
+    <div class="input-container">
+        <input type="text" id="questionInput" placeholder="Ask any Python question..." onkeypress="handleKeyPress(event)">
+        <button id="sendBtn" onclick="sendQuestion()">Send</button>
+    </div>
+</div>
+
+<script>
+const API_URL = 'http://127.0.0.1:8000';
+const chatContainer = document.getElementById('chatContainer');
+const questionInput = document.getElementById('questionInput');
+const sendBtn = document.getElementById('sendBtn');
+const statusEl = document.getElementById('status');
+
+// Check connection on load
+async function checkHealth() {
+    try {
+        const response = await fetch(`${API_URL}/chat?prompt=hello`, { method: 'POST' });
+        if(response.ok){
+            statusEl.textContent = '✓ Connected';
+            statusEl.className = 'status online';
+            questionInput.disabled = false;
+            sendBtn.disabled = false;
+        }
+    } catch {
+        statusEl.textContent = '✗ API not connected';
+        statusEl.className = 'status offline';
+        questionInput.disabled = true;
+        sendBtn.disabled = true;
+    }
+}
+
+// Add messages
+function addMessage(text, isUser){
+    const msgDiv = document.createElement('div');
+    msgDiv.className = `message ${isUser?'user':'bot'}`;
+    const contentDiv = document.createElement('div');
+    contentDiv.className = 'message-content';
+    contentDiv.innerHTML = isUser ? text : text.replace(/\n/g,'<br>');
+    msgDiv.appendChild(contentDiv);
+    chatContainer.appendChild(msgDiv);
+    chatContainer.scrollTop = chatContainer.scrollHeight;
+}
+
+// Show loading
+function showLoading(){
+    const loadingDiv = document.createElement('div');
+    loadingDiv.className = 'message bot';
+    loadingDiv.id = 'loading-message';
+    loadingDiv.innerHTML = '<div class="message-content"><div class="loading"></div> Thinking...</div>';
+    chatContainer.appendChild(loadingDiv);
+    chatContainer.scrollTop = chatContainer.scrollHeight;
+}
+
+function hideLoading(){
+    const loadingMsg = document.getElementById('loading-message');
+    if(loadingMsg) loadingMsg.remove();
+}
+
+// Send question
+async function sendQuestion(){
+    const question = questionInput.value.trim();
+    if(!question) return;
+
+    addMessage(question,true);
+    questionInput.value='';
+
+    sendBtn.disabled=true;
+    questionInput.disabled=true;
+    showLoading();
+
+    try{
+        const response = await fetch(`${API_URL}/chat?prompt=${encodeURIComponent(question)}`, {
+            method:'POST'
+        });
+
+        if(!response.ok) throw new Error(`API error: ${response.status}`);
+        const data = await response.json();
+        hideLoading();
+        addMessage(data.response, false);
+    } catch(e){
+        hideLoading();
+        addMessage(`❌ Error: Could not reach API. Make sure FastAPI is running on ${API_URL}`, false);
+        console.error(e);
+    } finally{
+        sendBtn.disabled=false;
+        questionInput.disabled=false;
+        questionInput.focus();
+    }
+}
+
+// Enter key
+function handleKeyPress(event){ if(event.key==='Enter'){ sendQuestion(); } }
+
+// Examples buttons
+function askExample(q){ questionInput.value=q; sendQuestion(); }
+
+questionInput.focus();
+checkHealth();
+</script>
+</body>
+</html>
